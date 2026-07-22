@@ -175,6 +175,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
+var URL_ALUMNO = window.location.origin + "/chat_aulav2/alumno.html";
+
+  
 var URL_ALUMNO = window.location.origin + "/alumno.html";
 var CODIGO_AULA = localStorage.getItem("ees7_codigo_aula") || Date.now().toString().slice(-4);
 localStorage.setItem("ees7_codigo_aula", CODIGO_AULA);

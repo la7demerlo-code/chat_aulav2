@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profesor - E.E.S. N7 Chat de Aula</title>
+<base target="_blank">
+</head>
+<body style="background:#0d1117;margin:0;padding:6px;">
+<style>
+*{box-sizing:border-box;}body{font-family:Arial,sans-serif;}
+.wrap{max-width:520px;margin:0 auto;}
+.sc-chat-wrapper{background:#0d223a;padding:8px;border-radius:8px;color:#fff;}
+.sc-botonera-3d{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;padding:5px;background:#09192b;border-radius:5px;margin-bottom:7px;}
+.sc-btn-letras{background:#e2e8f0;color:#0f2d4a;font-weight:900;font-style:italic;font-size:11px;text-align:center;padding:6px 1px;border-radius:4px;cursor:pointer;border:1px solid #94a3b8;box-shadow:0 3px 0 #64748b;transition:background .2s,box-shadow .1s,transform .1s;user-select:none;min-height:32px;display:flex;align-items:center;justify-content:center;position:relative;}
+.sc-btn-letras:active{box-shadow:0 1px 0 #64748b;transform:translateY(2px);}
+.sc-btn-letras.conectado{background:#80c217!important;color:#fff!important;border-color:#4d7c0f!important;box-shadow:0 3px 0 #3f6212!important;}
+.sc-btn-letras.hablando{background:#00f2fe!important;color:#000!important;border-color:#0e7490!important;box-shadow:0 3px 0 #155e75!important;}
+.sc-btn-letras.parpadeo{background:#faa51a!important;color:#fff!important;border-color:#b45309!important;box-shadow:0 3px 0 #78350f!important;animation:blink .6s infinite;}
+.sc-btn-letras.anulado{background:#1a1a1a!important;color:#444!important;border-color:#222!important;box-shadow:none!important;text-decoration:line-through;}
+.sc-btn-letras.especial{background:#312e81;color:#c7d2fe;border-color:#4338ca;box-shadow:0 3px 0 #3730a3;}
+.sc-btn-letras.especial.conectado{background:#80c217!important;color:#fff!important;border-color:#4d7c0f!important;box-shadow:0 3px 0 #3f6212!important;}
+.sc-btn-letras.especial.hablando{background:#00f2fe!important;color:#000!important;border-color:#0e7490!important;box-shadow:0 3px 0 #155e75!important;}
+.sc-btn-letras.especial.parpadeo{background:#faa51a!important;color:#fff!important;border-color:#b45309!important;box-shadow:0 3px 0 #78350f!important;}
+.sc-btn-letras .remoto-icon{position:absolute;top:1px;right:2px;font-size:9px;opacity:.8;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.sc-header{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px;flex-wrap:wrap;}
+.sc-logo-3d{padding:4px 12px;font-style:italic;font-weight:bold;font-size:12px;background:#1e5799;border-radius:50px;}
+.sc-subtitle{font-size:10px;color:#a4c2e6;}
+.sc-instruccion{font-size:10px;color:#94a3b8;padding:4px 8px;background:rgba(255,255,255,.04);border-radius:4px;margin-bottom:5px;line-height:1.5;}
+.sc-box{background:rgba(255,255,255,0.03);padding:6px;border-radius:4px;}
+.sc-row{display:flex;gap:3px;margin-bottom:4px;}
+.sc-input{flex:3;padding:6px;font-size:11px;height:28px;color:#000;border-radius:3px;border:none;}
+.sc-btn-3d{height:28px;font-weight:bold;font-size:10px;cursor:pointer;flex:1;border:none;border-radius:3px;border-bottom:2px solid rgba(0,0,0,.3);transition:all .1s;white-space:nowrap;}
+.sc-btn-3d:active{transform:translateY(2px);border-bottom-width:0;}
+.sc-btn-blue{background:#596a72;color:#fff;}
+.sc-btn-green{background:#80c217;color:#fff;}
+.sc-btn-orange{background:#f47a20;color:#fff;}
+.sc-btn-red{background:#7a1d1d;color:#fff;width:100%;}
+.sc-btn-wa{background:#16a34a;color:#fff;width:100%;height:32px;font-weight:bold;font-size:11px;cursor:pointer;border:none;border-radius:4px;border-bottom:2px solid #166534;margin-bottom:5px;}
+.sc-btn-modo-examen{background:#dc2626;color:#fff;width:100%;height:28px;font-weight:bold;font-size:10px;cursor:pointer;border:none;border-radius:3px;border-bottom:2px solid #991b1b;margin-bottom:4px;}
+.sc-btn-modo-examen.activo{background:#16a34a;border-bottom-color:#166534;}
+.audio-panel{background:#0a1628;border:1px solid #1e3a5f;border-radius:6px;padding:8px;margin-bottom:6px;}
+.audio-titulo{font-size:10px;color:#60a5fa;font-weight:bold;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.btn-mic{width:100%;padding:11px;border:none;border-radius:7px;font-weight:bold;font-size:13px;cursor:pointer;border-bottom:3px solid rgba(0,0,0,.3);transition:all .1s;margin-bottom:5px;}
+.btn-mic:active{transform:translateY(2px);}
+.btn-mic.off{background:#374151;color:#9ca3af;}
+.btn-mic.pidiendo{background:#d97706;color:#fff;}
+.btn-mic.on{background:#dc2626;color:#fff;border-bottom-color:#991b1b;animation:pulseRed 1.5s infinite;}
+.btn-mic.bloqueado{background:#7f1d1d;color:#fca5a5;}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+.vol-bar{height:6px;background:#1f2937;border-radius:3px;overflow:hidden;margin-top:3px;}
+.vol-fill{height:100%;background:#22c55e;width:0%;transition:width .08s;border-radius:3px;}
+.mic-info{font-size:10px;color:#6b7280;margin-top:3px;}
+.mic-info.ok{color:#22c55e;}
+.mic-info.err{color:#f87171;}
+.lista-alumnos{background:#0a1628;border:1px solid #1e3a5f;border-radius:5px;padding:6px;margin-bottom:6px;max-height:120px;overflow-y:auto;}
+.alumno-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;}
+.alumno-item .nombre{flex:1;color:#d1d5db;}
+.alumno-item .estado{font-size:9px;padding:2px 6px;border-radius:3px;}
+.alumno-item .estado.conectado{background:#14532d;color:#86efac;}
+.alumno-item .estado.parpadeo{background:#7c2d12;color:#fed7aa;}
+.alumno-item .estado.hablando{background:#1e3a5f;color:#93c5fd;}
+.alumno-item .btn-escuchar{background:#7c3aed;color:#fff;border:none;border-radius:3px;padding:3px 8px;font-size:9px;cursor:pointer;font-weight:bold;}
+.alumno-item .btn-escuchar:hover{background:#6d28d9;}
+.alumno-item .btn-cortar{background:#dc2626;color:#fff;border:none;border-radius:3px;padding:3px 8px;font-size:9px;cursor:pointer;font-weight:bold;}
+.hist-panel{background:#0a1628;border:1px solid #1e3a5f;border-radius:5px;padding:6px;margin-top:4px;}
+.hist-lista{max-height:100px;overflow-y:auto;font-size:11px;color:#d1d5db;margin-bottom:5px;line-height:1.5;}
+.hist-item{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.pantalla-inicio{background:#0d223a;padding:16px;border-radius:8px;text-align:center;color:#fff;}
+.btn-inicio{width:100%;padding:14px;font-size:15px;font-weight:bold;border:none;border-radius:9px;cursor:pointer;border-bottom:4px solid rgba(0,0,0,.3);margin-bottom:8px;}
+.btn-inicio:active{transform:translateY(3px);}
+.btn-inicio-mic{background:#2563eb;color:#fff;border-bottom-color:#1d4ed8;}
+.btn-inicio-txt{background:#374151;color:#d1d5db;font-size:13px;}
+.leyenda{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:5px;}
+.ley{display:flex;align-items:center;gap:3px;font-size:10px;color:#9ca3af;}
+.ley-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.toast-p{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:#1d4ed8;color:#fff;padding:8px 18px;border-radius:18px;font-size:12px;display:none;z-index:999;white-space:nowrap;}
+</style>
+
+<div class="wrap">
+
+<div id="pantallaInicio" class="pantalla-inicio">
+  <div style="font-size:38px;margin-bottom:8px;">&#127979;</div>
+  <div style="font-size:16px;font-weight:bold;margin-bottom:4px;">E.E.S. N&#176;7 - PROFESOR</div>
+  <div style="font-size:12px;color:#9ca3af;margin-bottom:14px;">Toca para activar el microfono.<br>El navegador va a pedir permiso - acepta.</div>
+  <button class="btn-inicio btn-inicio-mic" onclick="pedirPermisoMic()">&#127908; Activar microfono y entrar</button>
+  <button class="btn-inicio btn-inicio-txt" onclick="entrarSinMic()">Entrar solo con texto (sin microfono)</button>
+  <div id="msgPermiso" style="font-size:12px;color:#fbbf24;margin-top:6px;min-height:18px;"></div>
+</div>
+
+<div id="panelPrincipal" style="display:none;">
+<div class="sc-chat-wrapper">
+
+  <div class="sc-header">
+    <div class="sc-logo-3d">E.E.S. N&#176;7</div>
+    <div>
+      <div class="sc-subtitle" id="aulaIdTxt">&#9203; Conectando...</div>
+    </div>
+  </div>
+
+  <div class="sc-instruccion">
+    &#128161; <b>1 Clic mesa:</b> libre-conectado-hablando &nbsp;|&nbsp; <b>Clic "Escuchar":</b> dar/quitar la palabra &nbsp;|&nbsp; <span style="color:#c7d2fe;">&#9632;</span> 31-40 especiales &nbsp;|&nbsp; &#127968; remoto
+  </div>
+
+  <div class="leyenda">
+    <div class="ley"><div class="ley-dot" style="background:#e2e8f0;border:1px solid #94a3b8;"></div>libre</div>
+    <div class="ley"><div class="ley-dot" style="background:#80c217;"></div>conectado</div>
+    <div class="ley"><div class="ley-dot" style="background:#00f2fe;"></div>hablando</div>
+    <div class="ley"><div class="ley-dot" style="background:#faa51a;"></div>pide palabra</div>
+    <div class="ley"><div class="ley-dot" style="background:#312e81;border:1px solid #4338ca;"></div>especial</div>
+    <div class="ley"><div class="ley-dot" style="background:#1a1a1a;border:1px solid #333;"></div>anulado</div>
+    <div class="ley">&#127968; remoto</div>
+  </div>
+
+  <div class="audio-panel">
+    <div class="audio-titulo">&#127908; Tu Microfono</div>
+    <button class="btn-mic off" id="btnMicProfe" onclick="toggleMicProfe()">&#127908; Activar microfono</button>
+    <div class="vol-bar"><div class="vol-fill" id="volProfe"></div></div>
+    <div class="mic-info" id="estadoMicProfe">Listo</div>
+  </div>
+
+  <button class="sc-btn-modo-examen" id="btnModoExamen" onclick="toggleModoExamen()">&#128221; MODO EXAMEN: DESACTIVADO</button>
+
+  <div class="sc-botonera-3d" id="botoneraNumeros"></div>
+
+  <div class="lista-alumnos" id="listaAlumnos" style="display:none;">
+    <div class="audio-titulo">&#128101; Alumnos conectados</div>
+    <div id="listaAlumnosContenido"></div>
+  </div>
+
+  <button class="sc-btn-wa" onclick="copiarLinkWhatsApp()">&#128242; COPIAR LINK WHATSAPP &#128203;</button>
+
+  <div class="sc-box">
+    <div class="sc-row">
+      <button class="sc-btn-3d sc-btn-blue" onclick="enviarTodos()">&#127908; TODOS</button>
+      <button class="sc-btn-3d sc-btn-orange" onclick="cortarHabla()">&#128266; CORTAR</button>
+      <button class="sc-btn-3d sc-btn-red" onclick="mutearTodos()">&#128263; MUDO</button>
+    </div>
+    <div class="sc-row">
+      <input type="text" id="profLink" class="sc-input" placeholder="Pega el link https://...">
+      <button class="sc-btn-3d sc-btn-green" onclick="enviarLink()">&#128206; LINK</button>
+    </div>
+    <div class="sc-row">
+      <input type="text" id="profMsg" class="sc-input" placeholder="Escribi consigna o texto...">
+      <button class="sc-btn-3d sc-btn-blue" onclick="enviarMsg()">&#128233; TXT</button>
+    </div>
+    <div class="sc-row">
+      <input type="text" id="profMsgPrivado" class="sc-input" placeholder="Mensaje privado a mesa...">
+      <select id="selectMesaPrivado" style="flex:1;padding:6px;font-size:11px;border-radius:3px;border:none;">
+        <option value="">Mesa...</option>
+      </select>
+      <button class="sc-btn-3d sc-btn-orange" onclick="enviarPrivado()">&#9993; PRIV</button>
+    </div>
+
+    <div class="hist-panel">
+      <div class="audio-titulo">&#128203; Historial - para tardios</div>
+      <div class="hist-lista" id="histLista"><span style="color:#6b7280;">Aun no enviaste nada.</span></div>
+      <div class="sc-row">
+        <button class="sc-btn-3d sc-btn-green" style="height:28px;font-size:10px;" onclick="enviarHistorial()">&#128228; Enviar a tardios</button>
+        <button class="sc-btn-3d sc-btn-orange" style="height:28px;font-size:10px;" onclick="limpiarHistorial()">&#128465; Limpiar</button>
+        <button class="sc-btn-3d sc-btn-blue" style="height:28px;font-size:10px;" onclick="guardarHistorialLocal()">&#128190; Guardar</button>
+      </div>
+    </div>
+
+    <button class="sc-btn-3d sc-btn-red" style="margin-top:4px;" onclick="cerrarClase()">&#9888; CERRAR CHAT</button>
+  </div>
+
+</div>
+</div>
+</div>
+
+<div class="toast-p" id="toastP"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script>
+var URL_ALUMNO = window.location.origin + "/alumno.html";
+var CODIGO_AULA = localStorage.getItem("ees7_codigo_aula") || Date.now().toString().slice(-4);
+localStorage.setItem("ees7_codigo_aula", CODIGO_AULA);
+var canalBase = "ees7/clase/" + CODIGO_AULA;
+var mqttClient = null, peer = null, micStream = null, micActivo = false;
+var volInterval = null, estadosMesas = {}, conexionesAlumnos = {}, modoExamen = false;
+var historial = JSON.parse(localStorage.getItem("ees7_historial_" + CODIGO_AULA) || "[]");
+var llamadasActivas = {};
+var alumnoHablando = null;
+
+function pedirPermisoMic() {
+  document.getElementById("msgPermiso").textContent = "&#9203; Esperando permiso...";
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      document.getElementById("msgPermiso").textContent = "&#9989; Permiso concedido";
+      setTimeout(mostrarPanel, 500);
+    })
+    .catch(function(err) {
+      var m = err.name === "NotFoundError" ? "&#10060; No se encontro microfono." : "&#10060; Permiso denegado. Revisa permisos del navegador.";
+      document.getElementById("msgPermiso").textContent = m;
+    });
+}
+function entrarSinMic() { mostrarPanel(); }
+
+function mostrarPanel() {
+  document.getElementById("pantallaInicio").style.display = "none";
+  document.getElementById("panelPrincipal").style.display = "block";
+  construirGrilla();
+  renderizarHistorial();
+  setTimeout(conectarMQTT, 300);
+}
+
+function construirGrilla() {
+  var g = document.getElementById("botoneraNumeros");
+  for (var i = 1; i <= 40; i++) {
+    var d = document.createElement("div");
+    d.className = "sc-btn-letras" + (i >= 31 ? " especial" : "");
+    d.id = "btn-letra-" + i;
+    d.innerHTML = i + '<span class="remoto-icon" id="remoto-' + i + '"></span>';
+    (function(n) {
+      d.addEventListener("click", function() { presionarMesa(n); });
+    })(i);
+    g.appendChild(d);
+  }
+}
+
+function sonarWA() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [880, 1108, 1318].forEach(function(f, i) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = f; o.type = "sine";
+      g.gain.setValueAtTime(0, ctx.currentTime + i * .08);
+      g.gain.linearRampToValueAtTime(.18, ctx.currentTime + i * .08 + .02);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + i * .08 + .12);
+      o.start(ctx.currentTime + i * .08); o.stop(ctx.currentTime + i * .08 + .15);
+    });
+  } catch (e) { }
+}
+
+function toggleModoExamen() {
+  modoExamen = !modoExamen;
+  var btn = document.getElementById("btnModoExamen");
+  if (modoExamen) {
+    btn.classList.add("activo");
+    btn.textContent = "&#128221; MODO EXAMEN: ACTIVADO";
+    publicar("EXAMEN|todos|on", "p");
+    toast("&#128221; Modo examen activado");
+  } else {
+    btn.classList.remove("activo");
+    btn.textContent = "&#128221; MODO EXAMEN: DESACTIVADO";
+    publicar("EXAMEN|todos|off", "p");
+    toast("&#128221; Modo examen desactivado");
+  }
+}
+
+function mutearTodos() {
+  Object.keys(estadosMesas).forEach(function(mesa) {
+    if (estadosMesas[mesa] === "hablando") {
+      publicar("CTL|" + mesa + "|conectado", "p");
+      estadosMesas[mesa] = "conectado";
+    }
+  });
+  Object.keys(llamadasActivas).forEach(function(pid) {
+    if (llamadasActivas[pid]) llamadasActivas[pid].close();
+  });
+  llamadasActivas = {};
+  alumnoHablando = null;
+  actualizarTablero();
+  actualizarListaAlumnos();
+  toast("&#128263; Todos silenciados");
+}
+
+function conectarMQTT() {
+  try {
+    mqttClient = new Paho.MQTT.Client("broker.hivemq.com", Number(8884), "p_" + CODIGO_AULA + "_" + Math.floor(Math.random() * 9999));
+    mqttClient.onConnectionLost = function() {
+      document.getElementById("aulaIdTxt").innerText = "&#10060; Desconectado - reconectando...";
+      setTimeout(conectarMQTT, 4000);
+    };
+    mqttClient.onMessageArrived = function(msg) {
+      var p = msg.payloadString.split("|");
+      if (p.length < 3) return;
+      var tipo = p[0], mesa = p[1], estado = p[2];
+
+      if (tipo === "CON") {
+        estadosMesas[mesa] = "conectado";
+        actualizarTablero();
+        actualizarListaAlumnos();
+        sonarWA();
+        toast("&#9989; " + mesa.replace("mesa", "Mesa ") + " conectada");
+        if (peer && peer.id) {
+          setTimeout(function() {
+            publicar("PID|profe|" + peer.id, "p");
+          }, 500);
+        }
+      }
+      if (tipo === "PAL") {
+        estadosMesas[mesa] = "parpadeo";
+        actualizarTablero();
+        actualizarListaAlumnos();
+        sonarWA();
+        toast("&#9995; " + mesa.replace("mesa", "Mesa ") + " pide la palabra");
+      }
+      if (tipo === "PID") {
+        if (mesa !== "profe") {
+          conexionesAlumnos[mesa] = estado;
+          actualizarListaAlumnos();
+        }
+      }
+      if (tipo === "REMOTO") {
+        var num = parseInt(mesa.replace("mesa", ""));
+        var icon = document.getElementById("remoto-" + num);
+        if (icon) icon.textContent = "&#127968;";
+      }
+    };
+    mqttClient.connect({
+      onSuccess: function() {
+        document.getElementById("aulaIdTxt").innerText = "Aula: " + CODIGO_AULA;
+        mqttClient.subscribe(canalBase + "/a");
+        iniciarPeer();
+        toast("&#9989; Conectado - " + CODIGO_AULA);
+      },
+      onFailure: function() { document.getElementById("aulaIdTxt").innerText = "&#10060; Sin red"; },
+      useSSL: true, cleanSession: true, keepAliveInterval: 30
+    });
+  } catch (e) { document.getElementById("aulaIdTxt").innerText = "&#10060; Error MQTT"; }
+}
+
+function iniciarPeer() {
+  peer = new Peer("profe-" + CODIGO_AULA, { debug: 0 });
+  peer.on("open", function(id) {
+    publicar("PID|profe|" + id, "p");
+  });
+  peer.on("call", function(call) {
+    if (micActivo && micStream) call.answer(micStream);
+    else call.answer();
+    call.on("stream", function(remoteStream) {
+      var audio = document.createElement("audio");
+      audio.autoplay = true;
+      audio.srcObject = remoteStream;
+      audio.play().catch(function() { });
+      llamadasActivas[call.peer] = call;
+    });
+    call.on("close", function() {
+      delete llamadasActivas[call.peer];
+    });
+  });
+  peer.on("error", function(err) {
+    console.log("Peer error:", err);
+  });
+}
+
+function llamarAlumno(mesa, peerId) {
+  if (!peer || !peerId || !micStream) return;
+  var call = peer.call(peerId, micStream);
+  if (call) {
+    call.on("stream", function(remoteStream) {
+      var audio = document.createElement("audio");
+      audio.autoplay = true;
+      audio.srcObject = remoteStream;
+      audio.play().catch(function() { });
+      llamadasActivas[peerId] = call;
+    });
+    call.on("close", function() {
+      delete llamadasActivas[peerId];
+    });
+  }
+}
+
+function toggleMicProfe() {
+  if (micActivo) apagarMic();
+  else encenderMic();
+}
+function encenderMic() {
+  var btn = document.getElementById("btnMicProfe");
+  btn.className = "btn-mic pidiendo"; btn.textContent = "&#9203; Activando...";
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      micStream = stream; micActivo = true;
+      btn.className = "btn-mic on"; btn.textContent = "&#128308; ACTIVO - toca para apagar";
+      document.getElementById("estadoMicProfe").textContent = "Transmitiendo a todos...";
+      document.getElementById("estadoMicProfe").className = "mic-info ok";
+      Object.keys(conexionesAlumnos).forEach(function(mesa) {
+        if (conexionesAlumnos[mesa]) llamarAlumno(mesa, conexionesAlumnos[mesa]);
+      });
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var an = ctx.createAnalyser();
+        ctx.createMediaStreamSource(stream).connect(an); an.fftSize = 256;
+        var buf = new Uint8Array(an.frequencyBinCount);
+        volInterval = setInterval(function() {
+          an.getByteFrequencyData(buf);
+          var avg = buf.reduce(function(a, b) { return a + b; }, 0) / buf.length;
+          document.getElementById("volProfe").style.width = Math.min(100, avg * 2) + "%";
+        }, 80);
+      } catch (e) { }
+      publicar("AUD|profe|on", "p");
+      toast("&#127908; Transmitiendo");
+    })
+    .catch(function(err) {
+      btn.className = "btn-mic bloqueado";
+      btn.textContent = err.name === "NotAllowedError" ? "&#128683; Bloqueado - revisa permisos" : "&#128683; Sin microfono";
+      document.getElementById("estadoMicProfe").className = "mic-info err";
+      document.getElementById("estadoMicProfe").textContent = "Proba en Chrome";
+    });
+}
+function apagarMic() {
+  if (micStream) micStream.getTracks().forEach(function(t) { t.stop(); });
+  micStream = null; micActivo = false; clearInterval(volInterval);
+  document.getElementById("volProfe").style.width = "0%";
+  document.getElementById("btnMicProfe").className = "btn-mic off";
+  document.getElementById("btnMicProfe").textContent = "&#127908; Activar microfono";
+  document.getElementById("estadoMicProfe").textContent = "Apagado";
+  document.getElementById("estadoMicProfe").className = "mic-info";
+  publicar("AUD|profe|off", "p");
+  toast("Microfono apagado");
+}
+
+function actualizarTablero() {
+  for (var i = 1; i <= 40; i++) {
+    var b = document.getElementById("btn-letra-" + i);
+    if (!b) continue;
+    if (b.classList.contains("anulado")) continue;
+    var base = "sc-btn-letras" + (i >= 31 ? " especial" : "");
+    b.className = base;
+    if (estadosMesas["mesa" + i]) b.classList.add(estadosMesas["mesa" + i]);
+  }
+}
+
+function presionarMesa(i) {
+  var b = document.getElementById("btn-letra-" + i);
+  if (!b || b.classList.contains("anulado")) return;
+  var mesa = "mesa" + i;
+  var estActual = estadosMesas[mesa] || "libre";
+  var est;
+
+  if (estActual === "parpadeo") {
+    est = "hablando";
+    alumnoHablando = mesa;
+    var peerId = conexionesAlumnos[mesa];
+    if (peerId && micActivo && micStream) {
+      llamarAlumno(mesa, peerId);
+    }
+  } else if (estActual === "hablando") {
+    est = "conectado";
+    alumnoHablando = null;
+    Object.keys(llamadasActivas).forEach(function(pid) {
+      if (llamadasActivas[pid]) llamadasActivas[pid].close();
+    });
+    llamadasActivas = {};
+  } else if (estActual === "conectado" || estActual === "libre") {
+    est = "conectado";
+  } else {
+    est = "conectado";
+  }
+
+  publicar("CTL|" + mesa + "|" + est, "p");
+  if (est === "apagado") delete estadosMesas[mesa];
+  else estadosMesas[mesa] = est;
+  actualizarTablero();
+  actualizarListaAlumnos();
+}
+
+function anularMesa(i) {
+  var b = document.getElementById("btn-letra-" + i);
+  if (!b) return;
+  if (b.classList.contains("anulado")) {
+    var base = "sc-btn-letras" + (i >= 31 ? " especial" : "");
+    b.className = base;
+    delete estadosMesas["mesa" + i];
+    toast("Mesa " + i + " reactivada");
+  } else {
+    b.className = "sc-btn-letras anulado";
+    publicar("CTL|mesa" + i + "|apagado", "p");
+    delete estadosMesas["mesa" + i];
+    toast("Mesa " + i + " anulada");
+  }
+  actualizarListaAlumnos();
+}
+
+function actualizarListaAlumnos() {
+  var lista = document.getElementById("listaAlumnos");
+  var contenido = document.getElementById("listaAlumnosContenido");
+  var select = document.getElementById("selectMesaPrivado");
+  var mesasConectadas = Object.keys(estadosMesas).filter(function(m) {
+    return estadosMesas[m] && estadosMesas[m] !== "apagado";
+  });
+
+  if (mesasConectadas.length === 0) {
+    lista.style.display = "none";
+    return;
+  }
+  lista.style.display = "block";
+
+  select.innerHTML = '<option value="">Mesa...</option>';
+  mesasConectadas.forEach(function(mesa) {
+    var num = mesa.replace("mesa", "");
+    var opt = document.createElement("option");
+    opt.value = mesa;
+    opt.textContent = "Mesa " + num;
+    select.appendChild(opt);
+  });
+
+  contenido.innerHTML = "";
+  mesasConectadas.forEach(function(mesa) {
+    var num = mesa.replace("mesa", "");
+    var estado = estadosMesas[mesa];
+    var peerId = conexionesAlumnos[mesa];
+    var div = document.createElement("div");
+    div.className = "alumno-item";
+    var estadoClass = estado === "parpadeo" ? "parpadeo" : (estado === "hablando" ? "hablando" : "conectado");
+    var btnText = estado === "hablando" ? "Cortar" : "Escuchar";
+    var btnClass = estado === "hablando" ? "btn-cortar" : "btn-escuchar";
+    var btnAction = estado === "hablando" ? "cortarMesa('" + mesa + "')" : "darPalabraMesa('" + mesa + "')";
+    div.innerHTML = '<span class="nombre">Mesa ' + num + '</span><span class="estado ' + estadoClass + '">' + estado + '</span>' +
+      (peerId ? '<button class="' + btnClass + '" onclick="' + btnAction + '">' + btnText + '</button>' : '');
+    contenido.appendChild(div);
+  });
+}
+
+function darPalabraMesa(mesa) {
+  var num = parseInt(mesa.replace("mesa", ""));
+  var peerId = conexionesAlumnos[mesa];
+  estadosMesas[mesa] = "hablando";
+  alumnoHablando = mesa;
+  if (peerId && micActivo && micStream) {
+    llamarAlumno(mesa, peerId);
+  }
+  publicar("CTL|" + mesa + "|hablando", "p");
+  actualizarTablero();
+  actualizarListaAlumnos();
+  toast("&#127908; Mesa " + num + " hablando");
+}
+
+function cortarMesa(mesa) {
+  estadosMesas[mesa] = "conectado";
+  alumnoHablando = null;
+  Object.keys(llamadasActivas).forEach(function(pid) {
+    if (llamadasActivas[pid]) llamadasActivas[pid].close();
+  });
+  llamadasActivas = {};
+  publicar("CTL|" + mesa + "|conectado", "p");
+  actualizarTablero();
+  actualizarListaAlumnos();
+  toast("&#128266; Mesa " + mesa.replace("mesa", "") + " cortada");
+}
+
+function agregarHistorial(tipo, contenido) {
+  var hora = new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+  historial.push({ tipo: tipo, contenido: contenido, hora: hora });
+  localStorage.setItem("ees7_historial_" + CODIGO_AULA, JSON.stringify(historial));
+  renderizarHistorial();
+}
+
+function renderizarHistorial() {
+  var lista = document.getElementById("histLista");
+  if (historial.length === 0) {
+    lista.innerHTML = '<span style="color:#6b7280;">Aun no enviaste nada.</span>';
+    return;
+  }
+  lista.innerHTML = "";
+  historial.forEach(function(h) {
+    var div = document.createElement("div");
+    div.className = "hist-item";
+    var ico = h.tipo === "LNK" ? "&#128206;" : (h.tipo === "PRIV" ? "&#9993;" : "&#128221;");
+    div.innerHTML = "<span style='color:#6b7280;'>" + h.hora + "</span> " + ico + " " + h.contenido.substring(0, 55) + (h.contenido.length > 55 ? "..." : "");
+    lista.appendChild(div);
+  });
+  lista.scrollTop = lista.scrollHeight;
+}
+
+function enviarHistorial() {
+  if (historial.length === 0) { toast("No hay historial aun"); return; }
+  var resumen = "&#128203; HISTORIAL DE CLASE:\n";
+  historial.forEach(function(h) { resumen += h.hora + " " + h.contenido + "\n"; });
+  publicar("TXT|todos|" + resumen, "p");
+  toast("&#128228; Historial enviado");
+}
+
+function limpiarHistorial() {
+  historial = [];
+  localStorage.removeItem("ees7_historial_" + CODIGO_AULA);
+  document.getElementById("histLista").innerHTML = '<span style="color:#6b7280;">Limpiado.</span>';
+  toast("&#128465; Historial limpiado");
+}
+
+function guardarHistorialLocal() {
+  var texto = "HISTORIAL - E.E.S. N7\nAula: " + CODIGO_AULA + "\nFecha: " + new Date().toLocaleString("es-AR") + "\n\n";
+  historial.forEach(function(h) {
+    var ico = h.tipo === "LNK" ? "&#128206;" : (h.tipo === "PRIV" ? "&#9993;" : "&#128221;");
+    texto += h.hora + " " + ico + " " + h.contenido + "\n";
+  });
+  var blob = new Blob(["\ufeff" + texto], { type: "text/plain" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Historial_" + CODIGO_AULA + "_" + new Date().toISOString().slice(0, 10) + ".txt";
+  a.click();
+  toast("&#128190; Historial guardado");
+}
+
+function publicar(str, sub) {
+  if (mqttClient && mqttClient.isConnected()) {
+    var m = new Paho.MQTT.Message(str);
+    m.destinationName = canalBase + "/" + sub;
+    mqttClient.send(m);
+  } else { toast("Sin conexion MQTT"); }
+}
+
+function copiarLinkWhatsApp() {
+  var link = URL_ALUMNO + "?clase=" + CODIGO_AULA;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function() { toast("&#9989; Copiado - pegalo en WhatsApp"); });
+  } else {
+    var ta = document.createElement("textarea"); ta.value = link;
+    document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+    document.body.removeChild(ta); toast("&#9989; Copiado");
+  }
+}
+
+function enviarTodos() {
+  publicar("TXT|todos|&#128226; Atencion general!", "p");
+  agregarHistorial("TXT", "&#128226; Atencion general");
+  sonarWA(); toast("Enviado a todos");
+}
+
+function cortarHabla() {
+  Object.keys(estadosMesas).forEach(function(mesa) {
+    if (estadosMesas[mesa] === "hablando") {
+      estadosMesas[mesa] = "conectado";
+    }
+  });
+  alumnoHablando = null;
+  Object.keys(llamadasActivas).forEach(function(pid) {
+    if (llamadasActivas[pid]) llamadasActivas[pid].close();
+  });
+  llamadasActivas = {};
+  publicar("CTL|todos|conectado", "p");
+  actualizarTablero();
+  actualizarListaAlumnos();
+  toast("&#128266; Habla cortada");
+}
+
+function enviarLink() {
+  var v = document.getElementById("profLink").value.trim();
+  if (!v) { toast("Pega un link"); return; }
+  publicar("LNK|todos|" + v, "p");
+  agregarHistorial("LNK", v);
+  document.getElementById("profLink").value = "";
+  sonarWA(); toast("&#128206; Link enviado");
+}
+
+function enviarMsg() {
+  var v = document.getElementById("profMsg").value.trim();
+  if (!v) { toast("Escribi algo"); return; }
+  publicar("TXT|todos|" + v, "p");
+  agregarHistorial("TXT", v);
+  document.getElementById("profMsg").value = "";
+  sonarWA(); toast("&#128233; Texto enviado");
+}
+
+function enviarPrivado() {
+  var v = document.getElementById("profMsgPrivado").value.trim();
+  var mesa = document.getElementById("selectMesaPrivado").value;
+  if (!v) { toast("Escribi algo"); return; }
+  if (!mesa) { toast("Selecciona una mesa"); return; }
+  publicar("PRIV|" + mesa + "|" + v, "p");
+  agregarHistorial("PRIV", "[Mesa " + mesa.replace("mesa", "") + "] " + v);
+  document.getElementById("profMsgPrivado").value = "";
+  toast("&#9993; Privado a " + mesa.replace("mesa", "Mesa "));
+}
+
+function cerrarClase() {
+  if (confirm("Cerrar clase y desconectar a todos?")) {
+    apagarMic();
+    publicar("CTL|todos|apagado", "p");
+    limpiarHistorial();
+    estadosMesas = {};
+    conexionesAlumnos = {};
+    llamadasActivas = {};
+    alumnoHablando = null;
+    actualizarTablero();
+    actualizarListaAlumnos();
+    CODIGO_AULA = Date.now().toString().slice(-4);
+    localStorage.setItem("ees7_codigo_aula", CODIGO_AULA);
+    canalBase = "ees7/clase/" + CODIGO_AULA;
+    toast("&#9888; Clase cerrada - nuevo codigo: " + CODIGO_AULA);
+    setTimeout(function() { location.reload(); }, 2000);
+  }
+}
+
+function toast(msg) {
+  var t = document.getElementById("toastP");
+  t.textContent = msg; t.style.display = "block";
+  clearTimeout(t._t); t._t = setTimeout(function() { t.style.display = "none"; }, 2500);
+}
+</script>
+</body>
+</html>
